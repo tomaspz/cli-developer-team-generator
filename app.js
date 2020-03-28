@@ -1,3 +1,4 @@
+const Employee = require("./lib/Employee");
 const Manager = require("./lib/Manager");
 const Engineer = require("./lib/Engineer");
 const Intern = require("./lib/Intern");
@@ -13,6 +14,40 @@ const render = require("./lib/htmlRenderer");
 ​
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+const emailAnswerValidator = async (input) => {
+    if(input !== ^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$){
+        console.log("Please, type a correct email address!")
+    }
+    return;
+}
+
+inquirer.prompt([
+    {
+      type: "input",
+      name: "name",
+      message: "What is the team member's name?"
+    },
+    {
+      type: "input",
+      name: "id",
+      message: "What is the team member id?",
+    },
+    {
+        type: "input",
+        name: "email",
+        message: "What is the team member id?",
+      },
+    {
+      type: "input",
+      message: "What is the team member email?",
+      name: "email",
+      validation: emailAnswerValidator
+    }
+  ]).then(answers => { 
+
+  }).catch(error => { 
+    console.log("Sorry there was an error. Try again!")
+  });
 ​
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
