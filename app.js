@@ -88,7 +88,8 @@ inquirer.prompt(employeeQuestions).then(employeeAnswers => {
                         .then(managerAnswer => {
                             console.log(managerAnswer);
                             const {officeNumber} = managerAnswer;
-                            let manager = {name, id, email, officeNumber};
+                            let manager = new Manager(name, id, email, officeNumber);
+                            // let manager = {name, id, email, officeNumber};
                             console.log(manager);
                         })
                         .catch(error => {
@@ -101,7 +102,8 @@ inquirer.prompt(employeeQuestions).then(employeeAnswers => {
                         .then(engineerAnswer => {
                             const {github} = engineerAnswer;
                             // console.log(engineerAnswer);
-                            let engineer = {name, id, email, github};
+                            //let engineer = {name, id, email, github};
+                            let engineer = new Engineer(name, id, email, github);
                             console.log(engineer);
                         })
                         .catch(error => {
@@ -114,7 +116,8 @@ inquirer.prompt(employeeQuestions).then(employeeAnswers => {
                         .then(internAnswer => {
                             console.log(internAnswer);
                             const {school} = internAnswer;
-                            let intern = {name, id, email, school};
+                            let intern = new Intern(name, id, email, school);
+                            //let intern = {name, id, email, school};
                             console.log(intern);
                         })
                         .catch(error => {
