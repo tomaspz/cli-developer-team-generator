@@ -53,8 +53,79 @@ let employeeQuestions = [
     }
 ];
 
+let managerQuestion = 
+    {
+        type: "input",
+        name: "officeNumber",
+        message: "What is the manager's office number?"
+    }
+;
+
+let engineerQuestion = 
+    {
+        type: "input",
+        name: "github",
+        message: "What is the engineer's github username?"
+    }
+;
+
+let internQuestion = 
+    {
+        type: "input",
+        name: "school",
+        message: "What is the intern's school?"
+    }
+;
+
 inquirer.prompt(employeeQuestions).then(employeeAnswers => {
-     return employeeAnswers;
+    const {name, id, email} = employeeAnswers;
+    console.log(name);
+    console.log(id);
+    console.log(email);
+    let employee = new Employee(name, id, email);
+    switch(employeeAnswers.role) {
+        case "Manager": inquirer.prompt(managerQuestion)
+                        .then(managerAnswer => {
+                            console.log(managerAnswer);
+                            const {officeNumber} = managerAnswer;
+                            let manager = {name, id, email, officeNumber};
+                            console.log(manager);
+                        })
+                        .catch(error => {
+                            if (error) {throw error;}
+                            console.log("Error in the Manager!");
+                        });
+                        break;
+
+        case "Engineer": inquirer.prompt(engineerQuestion)
+                        .then(engineerAnswer => {
+                            const {github} = engineerAnswer;
+                            // console.log(engineerAnswer);
+                            let engineer = {name, id, email, github};
+                            console.log(engineer);
+                        })
+                        .catch(error => {
+                            if (error) {throw error;}
+                            console.log("Error in the Manager!");
+                        });
+                        break;
+
+        case "Intern":  inquirer.prompt(internQuestion)
+                        .then(internAnswer => {
+                            console.log(internAnswer);
+                            const {school} = internAnswer;
+                            let intern = {name, id, email, school};
+                            console.log(intern);
+                        })
+                        .catch(error => {
+                            if (error) {throw error;}
+                            console.log("Error in the Manager!");
+                        });
+                        break;
+    }
+    //  if(employeeAnswers.role === "Manager") {
+
+    //  }
 })
 .catch(error => {
     if (error) {
