@@ -18,6 +18,7 @@ const render = require("./lib/htmlRenderer");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
+let teamMembers = [];
 
 const employeeQuestions = [
     {
@@ -84,7 +85,7 @@ const askForMoreEmployeesQuestion =
 
 function askForMoreEmployees() {
     inquirer.prompt(askForMoreEmployeesQuestion).then(answer => {
-            if(answer === true){
+            if(answer.moreEmployees){
                 askQuestions();
             }
         }).catch(error => {
@@ -106,6 +107,7 @@ function askQuestions () {
                                 // console.log(managerAnswer);
                                 const {officeNumber} = managerAnswer;
                                 let manager = new Manager(name, id, email, officeNumber);
+                                teamMembers.push(manager);
                                 // let manager = {name, id, email, officeNumber};
                                 // console.log(manager);
                                 askForMoreEmployees();
@@ -122,6 +124,8 @@ function askQuestions () {
                                 // console.log(engineerAnswer);
                                 //let engineer = {name, id, email, github};
                                 let engineer = new Engineer(name, id, email, github);
+                                teamMembers.push(engineer);
+                                console.log(teamMembers);
                                 // console.log(engineer);
                                 askForMoreEmployees();
                             })
@@ -136,6 +140,7 @@ function askQuestions () {
                                 // console.log(internAnswer);
                                 const {school} = internAnswer;
                                 let intern = new Intern(name, id, email, school);
+                                teamMembers.push(intern);
                                 //let intern = {name, id, email, school};
                                 // console.log(intern);
                                 askForMoreEmployees()
@@ -155,14 +160,13 @@ function askQuestions () {
     }) // end of inquirer
 }; // end of askQuestions
 
-
-
 askQuestions();
-
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
+
+render(teamMembers);
 
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
