@@ -19,7 +19,7 @@ const render = require("./lib/htmlRenderer");
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
 
-let employeeQuestions = [
+const employeeQuestions = [
     {
         type: "input",
         name: "name",
@@ -53,89 +53,112 @@ let employeeQuestions = [
     }
 ];
 
-let managerQuestion = 
+const managerQuestion = 
     {
         type: "input",
         name: "officeNumber",
         message: "What is the manager's office number?"
-    }
-;
+    };
 
-let engineerQuestion = 
+const engineerQuestion = 
     {
         type: "input",
         name: "github",
         message: "What is the engineer's github username?"
-    }
-;
+    };
 
-let internQuestion = 
+const internQuestion = 
     {
         type: "input",
         name: "school",
         message: "What is the intern's school?"
-    }
-;
+    };
 
-inquirer.prompt(employeeQuestions).then(employeeAnswers => {
-    const {name, id, email} = employeeAnswers;
-    console.log(name);
-    console.log(id);
-    console.log(email);
-    let employee = new Employee(name, id, email);
-    switch(employeeAnswers.role) {
-        case "Manager": inquirer.prompt(managerQuestion)
-                        .then(managerAnswer => {
-                            console.log(managerAnswer);
-                            const {officeNumber} = managerAnswer;
-                            let manager = new Manager(name, id, email, officeNumber);
-                            // let manager = {name, id, email, officeNumber};
-                            console.log(manager);
-                        })
-                        .catch(error => {
-                            if (error) {throw error;}
-                            console.log("Error in the Manager!");
-                        });
-                        break;
+const askForMoreEmployeesQuestion =       
+    {
+        type: 'confirm',
+        name: 'moreEmployees',
+        message: 'Do you want to add another team member?',
+        default: false
+    };
 
-        case "Engineer": inquirer.prompt(engineerQuestion)
-                        .then(engineerAnswer => {
-                            const {github} = engineerAnswer;
-                            // console.log(engineerAnswer);
-                            //let engineer = {name, id, email, github};
-                            let engineer = new Engineer(name, id, email, github);
-                            console.log(engineer);
-                        })
-                        .catch(error => {
-                            if (error) {throw error;}
-                            console.log("Error in the Manager!");
-                        });
-                        break;
+function askForMoreEmployees() {
+    inquirer.prompt(askForMoreEmployeesQuestion).then(answer => {
+            if(answer === true){
+                askQuestions();
+            }
+        }).catch(error => {
+            if(error) throw error;
+            console.log("Error in the askForMoreEmployees function")
+        }) // end of catch
+}; // end of askForMore Employees
 
-        case "Intern":  inquirer.prompt(internQuestion)
-                        .then(internAnswer => {
-                            console.log(internAnswer);
-                            const {school} = internAnswer;
-                            let intern = new Intern(name, id, email, school);
-                            //let intern = {name, id, email, school};
-                            console.log(intern);
-                        })
-                        .catch(error => {
-                            if (error) {throw error;}
-                            console.log("Error in the Manager!");
-                        });
-                        break;
-    }
-    //  if(employeeAnswers.role === "Manager") {
+function askQuestions () {
+    inquirer.prompt(employeeQuestions).then(employeeAnswers => {
+        const {name, id, email} = employeeAnswers;
+        // console.log(name);
+        // console.log(id);
+        // console.log(email);
+        // let employee = new Employee(name, id, email);
+        switch(employeeAnswers.role) {
+            case "Manager": inquirer.prompt(managerQuestion)
+                            .then(managerAnswer => {
+                                // console.log(managerAnswer);
+                                const {officeNumber} = managerAnswer;
+                                let manager = new Manager(name, id, email, officeNumber);
+                                // let manager = {name, id, email, officeNumber};
+                                // console.log(manager);
+                                askForMoreEmployees();
+                            })
+                            .catch(error => {
+                                if (error) {throw error;}
+                                console.log("Error in the Manager!");
+                            });
+                            break;
 
-    //  }
-})
-.catch(error => {
-    if (error) {
-        throw error;
-    }
-    console.log("Sorry there was an error. Try again!");
-});
+            case "Engineer": inquirer.prompt(engineerQuestion)
+                            .then(engineerAnswer => {
+                                const {github} = engineerAnswer;
+                                // console.log(engineerAnswer);
+                                //let engineer = {name, id, email, github};
+                                let engineer = new Engineer(name, id, email, github);
+                                // console.log(engineer);
+                                askForMoreEmployees();
+                            })
+                            .catch(error => {
+                                if (error) {throw error;}
+                                console.log("Error in the Engineer!");
+                            });
+                            break;
+
+            case "Intern":  inquirer.prompt(internQuestion)
+                            .then(internAnswer => {
+                                // console.log(internAnswer);
+                                const {school} = internAnswer;
+                                let intern = new Intern(name, id, email, school);
+                                //let intern = {name, id, email, school};
+                                // console.log(intern);
+                                askForMoreEmployees()
+                            })
+                            .catch(error => {
+                                if (error) {throw error;}
+                                console.log("Error in the Intern!");
+                            });
+                            break;
+        } // end of switch statement
+    })
+    .catch(error => {
+        if (error) {
+            throw error;
+        }
+        console.log("Sorry there was an error. Try again!");
+    }) // end of inquirer
+}; // end of askQuestions
+
+
+
+askQuestions();
+
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
