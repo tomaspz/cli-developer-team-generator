@@ -1,5 +1,9 @@
 # Generate HTML with Team Members with Node and CLI.
 
+### Animated Gif
+
+![Animated Gif - How the app works](./assets/img/cli-team-member-generator.gif)
+
 * This Node CLI application asks questions to the user to collect information about employees.
 * The application prompts the user for information about the team members.
 * The abstract class "Employee" is used for inheritance of the team members.
@@ -36,9 +40,9 @@ AND specific information for each role,
 SO I can distinguish each user role.
 ```
 
-### Screenshot
+### Sample Screenshot
 
-### Animated Gif
+![Sample Screenshot](./assets/img/sample-screenshot.png)
 
 ### GitHub Repo URL
 
