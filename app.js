@@ -5,6 +5,7 @@ const Intern = require("./lib/Intern");
 const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
+const promisify = require('./node_modules/util.promisify');
 
 const OUTPUT_DIR = path.resolve(__dirname, "output");
 const outputPath = path.join(OUTPUT_DIR, "team.html");
@@ -18,7 +19,7 @@ const render = require("./lib/htmlRenderer");
 
 // Write code to use inquirer to gather information about the development team members,
 // and to create objects for each team member (using the correct classes as blueprints!)
-let teamMembers = [];
+let teamMembersArray = [];
 
 const employeeQuestions = [
     {
@@ -50,7 +51,6 @@ const employeeQuestions = [
         message: "What is the role of the team member?",
         name: "role",
         choices: ["Manager", "Engineer", "Intern"]
-
     }
 ];
 
@@ -83,96 +83,128 @@ const askForMoreEmployeesQuestion =
         default: false
     };
 
-function askForMoreEmployees() {
-    inquirer.prompt(askForMoreEmployeesQuestion).then(answer => {
-            if(answer.moreEmployees){
-                askQuestions();
-            }
-        }).catch(error => {
-            if(error) throw error;
-            console.log("Error in the askForMoreEmployees function")
-        }) // end of catch
+async function askForMoreEmployees() {
+    try {
+        const answer = await inquirer.prompt(askForMoreEmployeesQuestion);
+        if(answer.moreEmployees){
+            await askQuestions();
+        }
+        return teamMembersArray;
+    } catch (error) {
+        console.log("Error in the askForMoreEmployees function")
+    }
+            // console.log(teamMembersArray);
+            // const renderedHtml = render(teamMembersArray);
+            // var dir = './output';
+            // if(!fs.existsSync(dir)){
+            //     fs.mkdirSync(dir);
+            // };
+
+            // fs.writeFile(outputPath, renderedHtml, error => {
+            //     if(error) throw error;
+            //     console.log('The file has been saved!');
+            // })
 }; // end of askForMore Employees
 
-function askQuestions () {
-    inquirer.prompt(employeeQuestions).then(employeeAnswers => {
+async function askQuestions () {
+
+    try {
+        const employeeAnswers = await inquirer.prompt(employeeQuestions);
         const {name, id, email} = employeeAnswers;
-        // console.log(name);
-        // console.log(id);
-        // console.log(email);
-        // let employee = new Employee(name, id, email);
+
         switch(employeeAnswers.role) {
-            case "Manager": inquirer.prompt(managerQuestion)
-                            .then(managerAnswer => {
-                                // console.log(managerAnswer);
-                                const {officeNumber} = managerAnswer;
-                                let manager = new Manager(name, id, email, officeNumber);
-                                teamMembers.push(manager);
-                                // let manager = {name, id, email, officeNumber};
-                                // console.log(manager);
-                                askForMoreEmployees();
-                            })
-                            .catch(error => {
-                                if (error) {throw error;}
-                                console.log("Error in the Manager!");
-                            });
-                            break;
+            case "Manager": try {
+                const managerAnswer = await inquirer.prompt(managerQuestion);
+                const {officeNumber} = managerAnswer;
+                let manager = new Manager(name, id, email, officeNumber);
+                teamMembersArray.push(manager);
+                // let manager = {name, id, email, officeNumber};
+                // console.log(manager);
+                console.log(teamMembersArray);
+                await askForMoreEmployees();
+            } catch (error) {
+                console.log("Error in the Manager!");
+            };
+            break;
+            case "Engineer": try {
+                const engineerAnswer = await inquirer.prompt(engineerQuestion);
+                const {github} = engineerAnswer;
+                // console.log(engineerAnswer);
+                //let engineer = {name, id, email, github};
+                let engineer = new Engineer(name, id, email, github);
+                teamMembersArray.push(engineer);
+                console.log(teamMembersArray);
+                // console.log(engineer);
+                await askForMoreEmployees();
+            } catch (error) {
+                console.log("Error in the Engineer!");
+            }
+            break;
 
-            case "Engineer": inquirer.prompt(engineerQuestion)
-                            .then(engineerAnswer => {
-                                const {github} = engineerAnswer;
-                                // console.log(engineerAnswer);
-                                //let engineer = {name, id, email, github};
-                                let engineer = new Engineer(name, id, email, github);
-                                teamMembers.push(engineer);
-                                console.log(teamMembers);
-                                // console.log(engineer);
-                                askForMoreEmployees();
-                            })
-                            .catch(error => {
-                                if (error) {throw error;}
-                                console.log("Error in the Engineer!");
-                            });
-                            break;
-
-            case "Intern":  inquirer.prompt(internQuestion)
-                            .then(internAnswer => {
-                                // console.log(internAnswer);
-                                const {school} = internAnswer;
-                                let intern = new Intern(name, id, email, school);
-                                teamMembers.push(intern);
-                                //let intern = {name, id, email, school};
-                                // console.log(intern);
-                                askForMoreEmployees()
-                            })
-                            .catch(error => {
-                                if (error) {throw error;}
-                                console.log("Error in the Intern!");
-                            });
-                            break;
+            case "Intern": try {
+                const internAnswer = await inquirer.prompt(internQuestion);
+                // console.log(internAnswer);
+                const {school} = internAnswer;
+                let intern = new Intern(name, id, email, school);
+                teamMembersArray.push(intern);
+                //let intern = {name, id, email, school};
+                // console.log(intern);
+                console.log(teamMembersArray);
+                await askForMoreEmployees()
+            } catch (error) {
+                console.log("Error in the Intern!");
+            }
+            break;
         } // end of switch statement
-    })
-    .catch(error => {
-        if (error) {
-            throw error;
-        }
+    } catch (error) {
         console.log("Sorry there was an error. Try again!");
-    }) // end of inquirer
+    }        
+    // end of inquirer
 }; // end of askQuestions
 
-askQuestions();
+async function main() {
+    await askQuestions();
+
+    const renderedHtml = render(teamMembersArray);
+
+    var dir = './output';
+    if(!fs.existsSync(dir)){
+        console.log("Writing to file...");
+        fs.mkdirSync(dir);
+    };
+
+    fs.writeFile(outputPath, renderedHtml, error => {
+        if(error) throw error;
+        console.log('The file has been saved!');
+    });
+}
+
+main().then(()=>console.log('Finished!')).catch((err)=>console.log(err));
+
+
 
 // After the user has input all employees desired, call the `render` function (required
 // above) and pass in an array containing all employee objects; the `render` function will
 // generate and return a block of HTML including templated divs for each employee!
 
-render(teamMembers);
+//const renderedHtml = render(teamMembersArray);
+// console.log(renderedHtml);
 
 // After you have your html, you're now ready to create an HTML file using the HTML
 // returned from the `render` function. Now write it to a file named `team.html` in the
 // `output` folder. You can use the variable `outputPath` above target this location.
 // Hint: you may need to check if the `output` folder exists and create it if it
 // does not.
+
+//var dir = './output';
+//if(!fs.existsSync(dir)){
+//    fs.mkdirSync(dir);
+//};
+
+//fs.writeFile(outputPath, renderedHtml, error => {
+//    if(error) throw error;
+//    console.log('The file has been saved!');
+//})
 
 // HINT: each employee type (manager, engineer, or intern) has slightly different
 // information; write your code to ask different questions via inquirer depending on
